@@ -12,14 +12,14 @@ import (
 )
 
 var graphdef = map[string]mp.Graphs{
-	"puma.workers": {
+	"workers": {
 		Label: "Puma workers",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
 			{Name: "workers", Label: "Active workers", Diff: false},
 		},
 	},
-	"puma.phase": {
+	"phase": {
 		Label: "Puma phase",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
@@ -30,9 +30,10 @@ var graphdef = map[string]mp.Graphs{
 
 // PumaPlugin mackerel plugin for Puma
 type PumaPlugin struct {
-	Host  string
-	Port  string
-	Token string
+	Prefix string
+	Host   string
+	Port   string
+	Token  string
 }
 
 // Stats is convered from /stats json
@@ -115,10 +116,18 @@ func (p PumaPlugin) GraphDefinition() map[string]mp.Graphs {
 	return graphdef
 }
 
+// MetricKeyPrefix interface for PluginWithPrefix
+func (p PumaPlugin) MetricKeyPrefix() string {
+	if p.Prefix == "" {
+		p.Prefix = "puma"
+	}
+	return p.Prefix
+}
+
 // Do the plugin
 func Do() {
 	var (
-		// optPrefix = flag.String("metric-key-prefix", "", "Metric key prefix")
+		optPrefix   = flag.String("metric-key-prefix", "puma", "Metric key prefix")
 		optHost     = flag.String("host", "127.0.0.1", "The bind url to use for the control server")
 		optPort     = flag.String("port", "9293", "The bind port to use for the control server")
 		optToken    = flag.String("token", "", "The token to use as authentication for the control server")
@@ -127,6 +136,7 @@ func Do() {
 	flag.Parse()
 
 	var puma PumaPlugin
+	puma.Prefix = *optPrefix
 	puma.Host = *optHost
 	puma.Port = *optPort
 	puma.Token = *optToken
