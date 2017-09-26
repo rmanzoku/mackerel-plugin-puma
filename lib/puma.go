@@ -1,8 +1,10 @@
 package mppuma
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"net/http"
 	"time"
 
 	mp "github.com/mackerelio/go-mackerel-plugin-helper"
@@ -16,11 +18,20 @@ var graphdef = map[string]mp.Graphs{
 			{Name: "workers", Label: "Active workers", Diff: false},
 		},
 	},
+	"puma.phase": {
+		Label: "Puma phase",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "phase", Label: "Active phase", Diff: false},
+		},
+	},
 }
 
 // PumaPlugin mackerel plugin for Puma
 type PumaPlugin struct {
-	URI string
+	Host  string
+	Port  string
+	Token string
 }
 
 // Stats is convered from /stats json
@@ -72,16 +83,31 @@ type GCStats struct {
 }
 
 // FetchMetrics interface for mackerelplugin
-func (n PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
-	stat := make(map[string]interface{})
+func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
+	ret := make(map[string]interface{})
 
-	stat["workers"] = 2.0
-	return stat, nil
+	// Featch /stats
+	uri := fmt.Sprintf("http://%s:%s/%s?token=%s", p.Host, p.Port, "stats", p.Token)
+	resp, err := http.Get(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	var stats Stats
+	if err := json.NewDecoder(resp.Body).Decode(&stats); err != nil {
+		return nil, err
+	}
+
+	ret["workers"] = float64(stats.Workers)
+	ret["phase"] = float64(stats.Phase)
+	return ret, nil
 
 }
 
 // GraphDefinition interface for mackerelplugin
-func (n PumaPlugin) GraphDefinition() map[string]mp.Graphs {
+func (p PumaPlugin) GraphDefinition() map[string]mp.Graphs {
 	return graphdef
 }
 
@@ -97,7 +123,9 @@ func Do() {
 	flag.Parse()
 
 	var puma PumaPlugin
-	puma.URI = fmt.Sprintf("%s:%s?token=%s", *optHost, *optPort, *optToken)
+	puma.Host = *optHost
+	puma.Port = *optPort
+	puma.Token = *optToken
 
 	helper := mp.NewMackerelPlugin(puma)
 	helper.Tempfile = *optTempfile
