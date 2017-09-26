@@ -17,6 +17,8 @@ var graphdefStats = map[string]mp.Graphs{
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
 			{Name: "workers", Label: "Active workers", Diff: false},
+			{Name: "spawn_workers", Label: "Spawn workers", Diff: true},
+			{Name: "removed_workers", Label: "Removed workers", Diff: true},
 		},
 	},
 	"phase": {
@@ -150,6 +152,8 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	}
 
 	ret["workers"] = float64(stats.Workers)
+	ret["spawn_workers"] = float64(stats.BootedWorkers)
+	ret["removed_workers"] = float64(stats.OldWorkers)
 	ret["phase"] = float64(stats.Phase)
 
 	if p.WithGC == false {
