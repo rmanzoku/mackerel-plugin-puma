@@ -42,6 +42,7 @@ type PumaPlugin struct {
 	Host   string
 	Port   string
 	Token  string
+	WithGC bool
 }
 
 // Stats is convered from /stats json
@@ -144,15 +145,19 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	ret["workers"] = float64(stats.Workers)
+	ret["phase"] = float64(stats.Phase)
+
+	if p.WithGC == false {
+		return ret, nil
+	}
+
 	gcStats, err := p.fetchGCStats()
 	if err != nil {
 		return nil, err
 	}
 
-	ret["workers"] = float64(stats.Workers)
-	ret["phase"] = float64(stats.Phase)
-
-	// GC
 	ret["minor"] = float64(gcStats.MinorGcCount)
 	ret["major"] = float64(gcStats.MajorGcCount)
 	return ret, nil
@@ -179,6 +184,7 @@ func Do() {
 		optHost     = flag.String("host", "127.0.0.1", "The bind url to use for the control server")
 		optPort     = flag.String("port", "9293", "The bind port to use for the control server")
 		optToken    = flag.String("token", "", "The token to use as authentication for the control server")
+		optWithGC   = flag.Bool("with-gc", false, "Output include GC stats for Puma 3.10.0~")
 		optTempfile = flag.String("tempfile", "", "Temp file name")
 	)
 	flag.Parse()
@@ -188,6 +194,7 @@ func Do() {
 	puma.Host = *optHost
 	puma.Port = *optPort
 	puma.Token = *optToken
+	puma.WithGC = *optWithGC
 
 	helper := mp.NewMackerelPlugin(puma)
 	helper.Tempfile = *optTempfile
