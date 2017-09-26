@@ -2,6 +2,7 @@ package mppuma
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -92,8 +93,11 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New(resp.Status)
+	}
 
 	var stats Stats
 	if err := json.NewDecoder(resp.Body).Decode(&stats); err != nil {
