@@ -11,7 +11,7 @@ import (
 	mp "github.com/mackerelio/go-mackerel-plugin-helper"
 )
 
-var graphdef = map[string]mp.Graphs{
+var graphdefStats = map[string]mp.Graphs{
 	"workers": {
 		Label: "Puma workers",
 		Unit:  "integer",
@@ -26,6 +26,9 @@ var graphdef = map[string]mp.Graphs{
 			{Name: "phase", Label: "Active phase", Diff: false},
 		},
 	},
+}
+
+var graphdefGC = map[string]mp.Graphs{
 	"gc.count": {
 		Label: "GC Count",
 		Unit:  "integer",
@@ -166,6 +169,15 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 
 // GraphDefinition interface for mackerelplugin
 func (p PumaPlugin) GraphDefinition() map[string]mp.Graphs {
+	graphdef := graphdefStats
+
+	if p.WithGC == false {
+		return graphdef
+	}
+
+	for k, v := range graphdefGC {
+		graphdef[k] = v
+	}
 	return graphdef
 }
 
