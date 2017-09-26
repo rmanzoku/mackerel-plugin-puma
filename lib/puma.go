@@ -84,11 +84,11 @@ type GCStats struct {
 	OldmallocIncreaseBytesLimit         int `json:"oldmalloc_increase_bytes_limit"`
 }
 
-// FetchMetrics interface for mackerelplugin
-func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
-	ret := make(map[string]interface{})
+// Fetch /stats
+func (p PumaPlugin) fetchStats() (*Stats, error) {
 
-	// Featch /stats
+	var stats Stats
+
 	uri := fmt.Sprintf("http://%s:%s/%s?token=%s", p.Host, p.Port, "stats", p.Token)
 	resp, err := http.Get(uri)
 	if err != nil {
@@ -99,9 +99,20 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	if resp.StatusCode != 200 {
 		return nil, errors.New(resp.Status)
 	}
-
-	var stats Stats
 	if err := json.NewDecoder(resp.Body).Decode(&stats); err != nil {
+		return nil, err
+	}
+
+	return &stats, nil
+}
+
+// FetchMetrics interface for mackerelplugin
+func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
+	ret := make(map[string]interface{})
+
+	stats, err := p.fetchStats()
+
+	if err != nil {
 		return nil, err
 	}
 
