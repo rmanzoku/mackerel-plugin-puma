@@ -27,10 +27,11 @@ var graphdef = map[string]mp.Graphs{
 		},
 	},
 	"gc.count": {
-		Label: "GC count",
+		Label: "GC Count",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
-			{Name: "gccount", Label: "GC count", Diff: false},
+			{Name: "minor", Label: "Minor GC count", Stacked: true},
+			{Name: "major", Label: "Major GC count", Stacked: true},
 		},
 	},
 }
@@ -150,7 +151,10 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 
 	ret["workers"] = float64(stats.Workers)
 	ret["phase"] = float64(stats.Phase)
-	ret["gccount"] = float64(gcStats.Count)
+
+	// GC
+	ret["minor"] = float64(gcStats.MinorGcCount)
+	ret["major"] = float64(gcStats.MajorGcCount)
 	return ret, nil
 
 }
