@@ -26,6 +26,13 @@ var graphdef = map[string]mp.Graphs{
 			{Name: "phase", Label: "Active phase", Diff: false},
 		},
 	},
+	"gc.count": {
+		Label: "GC count",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "gccount", Label: "GC count", Diff: false},
+		},
+	},
 }
 
 // PumaPlugin mackerel plugin for Puma
@@ -106,18 +113,44 @@ func (p PumaPlugin) fetchStats() (*Stats, error) {
 	return &stats, nil
 }
 
+// Fetch /gc-stats
+func (p PumaPlugin) fetchGCStats() (*GCStats, error) {
+
+	var gcStats GCStats
+
+	uri := fmt.Sprintf("http://%s:%s/%s?token=%s", p.Host, p.Port, "gc-stats", p.Token)
+	resp, err := http.Get(uri)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, errors.New(resp.Status)
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&gcStats); err != nil {
+		return nil, err
+	}
+
+	return &gcStats, nil
+}
+
 // FetchMetrics interface for mackerelplugin
 func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret := make(map[string]interface{})
 
 	stats, err := p.fetchStats()
-
+	if err != nil {
+		return nil, err
+	}
+	gcStats, err := p.fetchGCStats()
 	if err != nil {
 		return nil, err
 	}
 
 	ret["workers"] = float64(stats.Workers)
 	ret["phase"] = float64(stats.Phase)
+	ret["gccount"] = float64(gcStats.Count)
 	return ret, nil
 
 }
