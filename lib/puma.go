@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	mp "github.com/mackerelio/go-mackerel-plugin-helper"
@@ -13,7 +14,7 @@ import (
 
 var graphdefStats = map[string]mp.Graphs{
 	"workers": {
-		Label: "Puma workers",
+		Label: "Puma Workers",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
 			{Name: "workers", Label: "Active workers", Diff: false},
@@ -21,40 +22,22 @@ var graphdefStats = map[string]mp.Graphs{
 			{Name: "removed_workers", Label: "Removed workers", Diff: true},
 		},
 	},
-	"backlog": {
-		Label: "Puma backlog",
+	"backlog.#": {
+		Label: "Puma Backlog",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
-			{Name: "total_backlog", Label: "Total backlog", Diff: false},
+			{Name: "backlog", Label: "Backlog", Diff: false, Stacked: true},
 		},
 	},
-	"backlog_stats": {
-		Label: "Puma backlog stats",
-		Unit:  "float",
-		Metrics: []mp.Metrics{
-			{Name: "max_backlog", Label: "Max backlog", Diff: false},
-			{Name: "ave_backlog", Label: "Average backlog", Diff: false},
-			{Name: "min_backlog", Label: "Min backlog", Diff: false},
-		},
-	},
-	"thread": {
-		Label: "Puma threads",
+	"running.#": {
+		Label: "Puma Running Thread",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
-			{Name: "total_threads", Label: "Total threads", Diff: false},
-		},
-	},
-	"thread_stats": {
-		Label: "Puma thread stats",
-		Unit:  "float",
-		Metrics: []mp.Metrics{
-			{Name: "max_threads", Label: "Max running threads", Diff: false},
-			{Name: "ave_threads", Label: "Average running threads", Diff: false},
-			{Name: "min_threads", Label: "Min running threads", Diff: false},
+			{Name: "running", Label: "running", Diff: false, Stacked: true},
 		},
 	},
 	"phase": {
-		Label: "Puma phase",
+		Label: "Puma Phase",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
 			{Name: "phase", Label: "Active phase", Diff: false},
@@ -73,7 +56,7 @@ var graphdefGC = map[string]mp.Graphs{
 		},
 	},
 	"gc.heap_slot": {
-		Label: "Puma GC Heap slot",
+		Label: "Puma GC Heap Slot",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
 			{Name: "available_slots", Label: "Heap available slots", Stacked: false},
@@ -186,54 +169,6 @@ func (p PumaPlugin) fetchGCStats() (*GCStats, error) {
 	return &gcStats, nil
 }
 
-func (s Stats) getBacklogMaxMinAveSum() (float64, float64, float64, float64) {
-	var sum int
-	var count int
-	var max = s.WorkerStatus[0].LastStatus.Backlog
-	var min = s.WorkerStatus[0].LastStatus.Backlog
-
-	for _, v := range s.WorkerStatus {
-		value := v.LastStatus.Backlog
-		sum += value
-		count++
-
-		if max < value {
-			max = value
-		}
-
-		if min > value {
-			min = value
-		}
-	}
-
-	ave := float64(sum) / float64(count)
-	return float64(max), float64(min), ave, float64(sum)
-}
-
-func (s Stats) getRunningMaxMinAveSum() (float64, float64, float64, float64) {
-	var sum int
-	var count int
-	var max = s.WorkerStatus[0].LastStatus.Running
-	var min = s.WorkerStatus[0].LastStatus.Running
-
-	for _, v := range s.WorkerStatus {
-		value := v.LastStatus.Running
-		sum += value
-		count++
-
-		if max < value {
-			max = value
-		}
-
-		if min > value {
-			min = value
-		}
-	}
-
-	ave := float64(sum) / float64(count)
-	return float64(max), float64(min), ave, float64(sum)
-}
-
 // FetchMetrics interface for mackerelplugin
 func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret := make(map[string]interface{})
@@ -248,8 +183,10 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret["removed_workers"] = float64(stats.OldWorkers)
 	ret["phase"] = float64(stats.Phase)
 
-	ret["max_backlog"], ret["min_backlog"], ret["ave_backlog"], ret["total_backlog"] = stats.getBacklogMaxMinAveSum()
-	ret["max_threads"], ret["min_threads"], ret["ave_threads"], ret["total_threads"] = stats.getRunningMaxMinAveSum()
+	for _, v := range stats.WorkerStatus {
+		ret["backlog.worker"+strconv.Itoa(v.Index)+".backlog"] = float64(v.LastStatus.Backlog)
+		ret["running.worker"+strconv.Itoa(v.Index)+".running"] = float64(v.LastStatus.Running)
+	}
 
 	if p.WithGC == false {
 		return ret, nil
