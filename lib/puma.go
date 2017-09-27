@@ -178,8 +178,8 @@ func (p PumaPlugin) fetchGCStats() (*GCStats, error) {
 func (s Stats) getBacklogMaxMinAveSum() (float64, float64, float64, float64) {
 	var sum int
 	var count int
-	var max = 0
-	var min = 0
+	var max = s.WorkerStatus[0].LastStatus.Backlog
+	var min = s.WorkerStatus[0].LastStatus.Backlog
 
 	for _, v := range s.WorkerStatus {
 		value := v.LastStatus.Backlog
