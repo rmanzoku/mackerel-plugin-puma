@@ -72,6 +72,17 @@ var graphdefGC = map[string]mp.Graphs{
 			{Name: "major", Label: "Major GC count", Stacked: true},
 		},
 	},
+	"gc.heap_slot": {
+		Label: "Puma GC Heap slot",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "available_slots", Label: "Heap available slots", Stacked: false},
+			{Name: "live_slots", Label: "Heap live slots", Stacked: true},
+			{Name: "free_slots", Label: "Heap free slots", Stacked: true},
+			{Name: "final_slots", Label: "Heap final slots", Stacked: false},
+			{Name: "marked_slots", Label: "Heap marked slots", Stacked: false},
+		},
+	},
 }
 
 // PumaPlugin mackerel plugin for Puma
@@ -252,6 +263,13 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret["total"] = float64(gcStats.Count)
 	ret["minor"] = float64(gcStats.MinorGcCount)
 	ret["major"] = float64(gcStats.MajorGcCount)
+
+	ret["available_slots"] = float64(gcStats.HeapAvailableSlots)
+	ret["live_slots"] = float64(gcStats.HeapLiveSlots)
+	ret["free_slots"] = float64(gcStats.HeapFreeSlots)
+	ret["final_slots"] = float64(gcStats.HeapFinalSlots)
+	ret["marked_slots"] = float64(gcStats.HeapMarkedSlots)
+
 	return ret, nil
 
 }
