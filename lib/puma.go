@@ -37,20 +37,20 @@ var graphdefStats = map[string]mp.Graphs{
 			{Name: "min_backlog", Label: "Min backlog", Diff: false},
 		},
 	},
-	"running": {
-		Label: "Puma running",
+	"thread": {
+		Label: "Puma threads",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
-			{Name: "total_running", Label: "Total running", Diff: false},
+			{Name: "total_threads", Label: "Total threads", Diff: false},
 		},
 	},
-	"running_stats": {
-		Label: "Puma running stats",
+	"thread_stats": {
+		Label: "Puma thread stats",
 		Unit:  "float",
 		Metrics: []mp.Metrics{
-			{Name: "max_running", Label: "Max running", Diff: false},
-			{Name: "ave_running", Label: "Average running", Diff: false},
-			{Name: "min_running", Label: "Min running", Diff: false},
+			{Name: "max_threads", Label: "Max running threads", Diff: false},
+			{Name: "ave_threads", Label: "Average running threads", Diff: false},
+			{Name: "min_threads", Label: "Min running threads", Diff: false},
 		},
 	},
 	"phase": {
@@ -238,7 +238,7 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret["phase"] = float64(stats.Phase)
 
 	ret["max_backlog"], ret["min_backlog"], ret["ave_backlog"], ret["total_backlog"] = stats.getBacklogMaxMinAveSum()
-	ret["max_running"], ret["min_running"], ret["ave_running"], ret["total_running"] = stats.getRunningMaxMinAveSum()
+	ret["max_threads"], ret["min_threads"], ret["ave_threads"], ret["total_threads"] = stats.getRunningMaxMinAveSum()
 
 	if p.WithGC == false {
 		return ret, nil
