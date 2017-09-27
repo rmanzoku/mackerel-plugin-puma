@@ -37,6 +37,22 @@ var graphdefStats = map[string]mp.Graphs{
 			{Name: "min_backlog", Label: "Min backlog", Diff: false},
 		},
 	},
+	"running": {
+		Label: "Puma running",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "total_running", Label: "Total running", Diff: false},
+		},
+	},
+	"running_stats": {
+		Label: "Puma running stats",
+		Unit:  "float",
+		Metrics: []mp.Metrics{
+			{Name: "max_running", Label: "Max running", Diff: false},
+			{Name: "ave_running", Label: "Average running", Diff: false},
+			{Name: "min_running", Label: "Min running", Diff: false},
+		},
+	},
 	"phase": {
 		Label: "Puma phase",
 		Unit:  "integer",
@@ -183,6 +199,30 @@ func (s Stats) getBacklogMaxMinAveSum() (float64, float64, float64, float64) {
 	return float64(max), float64(min), ave, float64(sum)
 }
 
+func (s Stats) getRunningMaxMinAveSum() (float64, float64, float64, float64) {
+	var sum int
+	var count int
+	var max = s.WorkerStatus[0].LastStatus.Running
+	var min = s.WorkerStatus[0].LastStatus.Running
+
+	for _, v := range s.WorkerStatus {
+		value := v.LastStatus.Running
+		sum += value
+		count++
+
+		if max < value {
+			max = value
+		}
+
+		if min > value {
+			min = value
+		}
+	}
+
+	ave := float64(sum) / float64(count)
+	return float64(max), float64(min), ave, float64(sum)
+}
+
 // FetchMetrics interface for mackerelplugin
 func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret := make(map[string]interface{})
@@ -198,6 +238,7 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret["phase"] = float64(stats.Phase)
 
 	ret["max_backlog"], ret["min_backlog"], ret["ave_backlog"], ret["total_backlog"] = stats.getBacklogMaxMinAveSum()
+	ret["max_running"], ret["min_running"], ret["ave_running"], ret["total_running"] = stats.getRunningMaxMinAveSum()
 
 	if p.WithGC == false {
 		return ret, nil
