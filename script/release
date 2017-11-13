@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Usage:
+# $ script/release # Setting github.token in .gitconfig is required
+# $ GITHUB_TOKEN=... script/release
+
+set -e
+latest_tag=$(git describe --abbrev=0 --tags)
+goxc
+ghr -u rmanzoku -r mackerel-plugin-puma $latest_tag dist/snapshot/
