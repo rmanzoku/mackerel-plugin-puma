@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	mp "github.com/mackerelio/go-mackerel-plugin-helper"
+	mp "github.com/mackerelio/go-mackerel-plugin"
 )
 
 var graphdefStats = map[string]mp.Graphs{
@@ -214,8 +214,8 @@ func (p PumaPlugin) fetchGCStats() (*GCStats, error) {
 }
 
 // FetchMetrics interface for mackerelplugin
-func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
-	ret := make(map[string]interface{})
+func (p PumaPlugin) FetchMetrics() (map[string]float64, error) {
+	ret := make(map[string]float64)
 
 	stats, err := p.fetchStats()
 	if err != nil {
