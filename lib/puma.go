@@ -66,6 +66,22 @@ var graphdefGC = map[string]mp.Graphs{
 			{Name: "marked_slots", Label: "Heap marked slots", Stacked: false},
 		},
 	},
+	"gc.old_objects": {
+		Label: "Puma GC Old Objects",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "old_count", Label: "Old Objects", Stacked: false},
+			{Name: "old_limit", Label: "Old Objects Limit", Stacked: true},
+		},
+	},
+	"gc.old_malloc": {
+		Label: "Puma GC Old Malloc Increase",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "old_malloc_bytes", Label: "Old Malloc Increase Bytes", Stacked: false},
+			{Name: "old_malloc_limit", Label: "Old Malloc Increase Bytes Limit", Stacked: true},
+		},
+	},
 }
 
 // PumaPlugin mackerel plugin for Puma
@@ -234,6 +250,12 @@ func (p PumaPlugin) FetchMetrics() (map[string]interface{}, error) {
 	ret["free_slots"] = float64(gcStats.HeapFreeSlots)
 	ret["final_slots"] = float64(gcStats.HeapFinalSlots)
 	ret["marked_slots"] = float64(gcStats.HeapMarkedSlots)
+
+	ret["old_count"] = float64(gcStats.OldObjects)
+	ret["old_limit"] = float64(gcStats.OldObjectsLimit)
+
+	ret["old_malloc_bytes"] = float64(gcStats.OldmallocIncreaseBytes)
+	ret["old_malloc_limit"] = float64(gcStats.OldmallocIncreaseBytesLimit)
 
 	return ret, nil
 
