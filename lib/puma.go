@@ -47,7 +47,7 @@ func (p PumaPlugin) FetchMetrics() (map[string]float64, error) {
 		return nil, err
 	}
 
-	gcStatsMetrics := p.fetchGCStatsMetrics(gcStats)
+	gcStatsMetrics, _ := p.fetchGCStatsMetrics(gcStats)
 
 	ret = merge(ret, gcStatsMetrics)
 
