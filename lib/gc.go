@@ -146,15 +146,28 @@ func (p PumaPlugin) fetchGCStatsMetrics(gcStats *GCStats) (map[string]float64, e
 	if gcStats.HeapAvailableSlots.String() != "" {
 		ret["available_slots"], _ = gcStats.HeapAvailableSlots.Float64()
 	}
+
+	if gcStats.HeapLiveNum.String() != "" {
+		ret["live_slots"], _ = gcStats.HeapLiveNum.Float64()
+	}
 	if gcStats.HeapLiveSlots.String() != "" {
 		ret["live_slots"], _ = gcStats.HeapLiveSlots.Float64()
+	}
+
+	if gcStats.HeapFreeNum.String() != "" {
+		ret["free_slots"], _ = gcStats.HeapFreeNum.Float64()
 	}
 	if gcStats.HeapFreeSlots.String() != "" {
 		ret["free_slots"], _ = gcStats.HeapFreeSlots.Float64()
 	}
+
+	if gcStats.HeapFinalNum.String() != "" {
+		ret["final_slots"], _ = gcStats.HeapFinalNum.Float64()
+	}
 	if gcStats.HeapFinalSlots.String() != "" {
 		ret["final_slots"], _ = gcStats.HeapFinalSlots.Float64()
 	}
+
 	if gcStats.HeapMarkedSlots.String() != "" {
 		ret["marked_slots"], _ = gcStats.HeapMarkedSlots.Float64()
 	}
