@@ -150,6 +150,9 @@ func (p PumaPlugin) fetchGCStatsMetrics(gcStats *GCStats) (map[string]float64, e
 	if gcStats.HeapLiveNum.String() != "" {
 		ret["live_slots"], _ = gcStats.HeapLiveNum.Float64()
 	}
+	if gcStats.HeapLiveSlot.String() != "" {
+		ret["live_slots"], _ = gcStats.HeapLiveSlot.Float64()
+	}
 	if gcStats.HeapLiveSlots.String() != "" {
 		ret["live_slots"], _ = gcStats.HeapLiveSlots.Float64()
 	}
@@ -157,12 +160,18 @@ func (p PumaPlugin) fetchGCStatsMetrics(gcStats *GCStats) (map[string]float64, e
 	if gcStats.HeapFreeNum.String() != "" {
 		ret["free_slots"], _ = gcStats.HeapFreeNum.Float64()
 	}
+	if gcStats.HeapFreeSlot.String() != "" {
+		ret["free_slots"], _ = gcStats.HeapFreeSlot.Float64()
+	}
 	if gcStats.HeapFreeSlots.String() != "" {
 		ret["free_slots"], _ = gcStats.HeapFreeSlots.Float64()
 	}
 
 	if gcStats.HeapFinalNum.String() != "" {
 		ret["final_slots"], _ = gcStats.HeapFinalNum.Float64()
+	}
+	if gcStats.HeapFinalSlot.String() != "" {
+		ret["final_slots"], _ = gcStats.HeapFinalSlot.Float64()
 	}
 	if gcStats.HeapFinalSlots.String() != "" {
 		ret["final_slots"], _ = gcStats.HeapFinalSlots.Float64()
@@ -173,14 +182,26 @@ func (p PumaPlugin) fetchGCStatsMetrics(gcStats *GCStats) (map[string]float64, e
 	}
 
 	// old
+	if gcStats.OldObject.String() != "" {
+		ret["old_count"], _ = gcStats.OldObject.Float64()
+	}
 	if gcStats.OldObjects.String() != "" {
 		ret["old_count"], _ = gcStats.OldObjects.Float64()
+	}
+	if gcStats.OldObjectLimit.String() != "" {
+		ret["old_limit"], _ = gcStats.OldObjectLimit.Float64()
 	}
 	if gcStats.OldObjectsLimit.String() != "" {
 		ret["old_limit"], _ = gcStats.OldObjectsLimit.Float64()
 	}
+	if gcStats.OldmallocIncrease.String() != "" {
+		ret["old_malloc_bytes"], _ = gcStats.OldmallocIncrease.Float64()
+	}
 	if gcStats.OldmallocIncreaseBytes.String() != "" {
 		ret["old_malloc_bytes"], _ = gcStats.OldmallocIncreaseBytes.Float64()
+	}
+	if gcStats.OldmallocLimit.String() != "" {
+		ret["old_malloc_limit"], _ = gcStats.OldmallocLimit.Float64()
 	}
 	if gcStats.OldmallocIncreaseBytesLimit.String() != "" {
 		ret["old_malloc_limit"], _ = gcStats.OldmallocIncreaseBytesLimit.Float64()

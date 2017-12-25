@@ -46,3 +46,64 @@ func TestFetchGCStatsMetricsRuby20(t *testing.T) {
 		}
 	}
 }
+
+func TestFetchGCStatsMetricsRuby21(t *testing.T) {
+
+	gcStatJSON := `{
+                "count": 5,
+                "heap_used": 75,
+                "heap_length": 81,
+                "heap_increment": 6,
+                "heap_live_slot": 29819,
+                "heap_free_slot": 752,
+                "heap_final_slot": 0,
+                "heap_swept_slot": 3861,
+                "heap_eden_page_length": 75,
+                "heap_tomb_page_length": 0,
+                "total_allocated_object": 48629,
+                "total_freed_object": 18810,
+                "malloc_increase": 1076728,
+                "malloc_limit": 16777216,
+                "minor_gc_count": 3,
+                "major_gc_count": 2,
+                "remembered_shady_object": 151,
+                "remembered_shady_object_limit": 300,
+                "old_object": 5842,
+                "old_object_limit": 11684,
+                "oldmalloc_increase": 1077176,
+                "oldmalloc_limit": 16777216
+        }`
+
+	desired := map[string]float64{
+		"total":            float64(5),
+		"minor":            float64(3),
+		"major":            float64(2),
+		"live_slots":       float64(29819),
+		"free_slots":       float64(752),
+		"final_slots":      float64(0),
+		"old_count":        float64(5842),
+		"old_limit":        float64(11684),
+		"old_malloc_bytes": float64(1077176),
+		"old_malloc_limit": float64(16777216),
+	}
+
+	var p PumaPlugin
+	var gcStats GCStats
+	json.Unmarshal([]byte(gcStatJSON), &gcStats)
+
+	ret, _ := p.fetchGCStatsMetrics(&gcStats)
+
+	if len(ret) != len(desired) {
+		t.Errorf("fetchGCStatsMetrics: len(ret) = %d should be len(desired) = %d", len(ret), len(desired))
+	}
+
+	for k, v := range desired {
+		if _, ok := ret[k]; !ok {
+			t.Errorf("%s not xists", k)
+		}
+
+		if ret[k] != v {
+			t.Errorf("%s should be %f, out %f", k, v, ret[k])
+		}
+	}
+}
