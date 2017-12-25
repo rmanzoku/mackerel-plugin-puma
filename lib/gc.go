@@ -48,59 +48,61 @@ var graphdefGC = map[string]mp.Graphs{
 	},
 }
 
+type response map[string]float64
+
 // GCStats is convered from /gc-stats json
 type GCStats struct {
 	// Ruby2.0
-	Count                int64 `json:"count"`
-	HeapFinalNum         int64 `json:"heap_final_num"`
-	HeapFreeNum          int64 `json:"heap_free_num"`
-	HeapIncrement        int64 `json:"heap_increment"`
-	HeapLength           int64 `json:"heap_length"`
-	HeapLiveNum          int64 `json:"heap_live_num"`
-	HeapUsed             int64 `json:"heap_used"`
-	TotalAllocatedObject int64 `json:"total_allocated_object"`
-	TotalFreedObject     int64 `json:"total_freed_object"`
+	Count                json.Number `json:"count"`
+	HeapFinalNum         json.Number `json:"heap_final_num"`
+	HeapFreeNum          json.Number `json:"heap_free_num"`
+	HeapIncrement        json.Number `json:"heap_increment"`
+	HeapLength           json.Number `json:"heap_length"`
+	HeapLiveNum          json.Number `json:"heap_live_num"`
+	HeapUsed             json.Number `json:"heap_used"`
+	TotalAllocatedObject json.Number `json:"total_allocated_object"`
+	TotalFreedObject     json.Number `json:"total_freed_object"`
 	// Added since Ruby2.1
-	HeapLiveSlot               int `json:"heap_live_slot"`
-	HeapFreeSlot               int `json:"heap_free_slot"`
-	HeapFinalSlot              int `json:"heap_final_slot"`
-	HeapSweptSlot              int `json:"heap_swept_slot"`
-	HeapEdenPageLength         int `json:"heap_eden_page_length"`
-	HeapTombPageLength         int `json:"heap_tomb_page_length"`
-	MallocIncrease             int `json:"malloc_increase"`
-	MallocLimit                int `json:"malloc_limit"`
-	MinorGcCount               int `json:"minor_gc_count"`
-	MajorGcCount               int `json:"major_gc_count"`
-	RememberedShadyObject      int `json:"remembered_shady_object"`
-	RememberedShadyObjectLimit int `json:"remembered_shady_object_limit"`
-	OldObject                  int `json:"old_object"`
-	OldObjectLimit             int `json:"old_object_limit"`
-	OldmallocIncrease          int `json:"oldmalloc_increase"`
-	OldmallocLimit             int `json:"oldmalloc_limit"`
+	HeapLiveSlot               json.Number `json:"heap_live_slot"`
+	HeapFreeSlot               json.Number `json:"heap_free_slot"`
+	HeapFinalSlot              json.Number `json:"heap_final_slot"`
+	HeapSweptSlot              json.Number `json:"heap_swept_slot"`
+	HeapEdenPageLength         json.Number `json:"heap_eden_page_length"`
+	HeapTombPageLength         json.Number `json:"heap_tomb_page_length"`
+	MallocIncrease             json.Number `json:"malloc_increase"`
+	MallocLimit                json.Number `json:"malloc_limit"`
+	MinorGcCount               json.Number `json:"minor_gc_count"`
+	MajorGcCount               json.Number `json:"major_gc_count"`
+	RememberedShadyObject      json.Number `json:"remembered_shady_object"`
+	RememberedShadyObjectLimit json.Number `json:"remembered_shady_object_limit"`
+	OldObject                  json.Number `json:"old_object"`
+	OldObjectLimit             json.Number `json:"old_object_limit"`
+	OldmallocIncrease          json.Number `json:"oldmalloc_increase"`
+	OldmallocLimit             json.Number `json:"oldmalloc_limit"`
 	// Added since Ruby2.2
-	HeapAllocatedPages                  int `json:"heap_allocated_pages"`
-	HeapSortedLength                    int `json:"heap_sorted_length"`
-	HeapAllocatablePages                int `json:"heap_allocatable_pages"`
-	HeapAvailableSlots                  int `json:"heap_available_slots"`
-	HeapLiveSlots                       int `json:"heap_live_slots"`
-	HeapFreeSlots                       int `json:"heap_free_slots"`
-	HeapFinalSlots                      int `json:"heap_final_slots"`
-	HeapMarkedSlots                     int `json:"heap_marked_slots"`
-	HeapSweptSlots                      int `json:"heap_swept_slots"`
-	HeapEdenPages                       int `json:"heap_eden_pages"`
-	HeapTombPages                       int `json:"heap_tomb_pages"`
-	TotalAllocatedPages                 int `json:"total_allocated_pages"`
-	TotalFreedPages                     int `json:"total_freed_pages"`
-	TotalAllocatedObjects               int `json:"total_allocated_objects"`
-	TotalFreedObjects                   int `json:"total_freed_objects"`
-	MallocIncreaseBytes                 int `json:"malloc_increase_bytes"`
-	MallocIncreaseBytesLimit            int `json:"malloc_increase_bytes_limit"`
-	RememberedWbUnprotectedObjects      int `json:"remembered_wb_unprotected_objects"`
-	RememberedWbUnprotectedObjectsLimit int `json:"remembered_wb_unprotected_objects_limit"`
-	OldObjects                          int `json:"old_objects"`
-	OldObjectsLimit                     int `json:"old_objects_limit"`
-	OldmallocIncreaseBytes              int `json:"oldmalloc_increase_bytes"`
-	OldmallocIncreaseBytesLimit         int `json:"oldmalloc_increase_bytes_limit"`
+	HeapAllocatedPages                  json.Number `json:"heap_allocated_pages"`
+	HeapSortedLength                    json.Number `json:"heap_sorted_length"`
+	HeapAllocatablePages                json.Number `json:"heap_allocatable_pages"`
+	HeapAvailableSlots                  json.Number `json:"heap_available_slots"`
+	HeapLiveSlots                       json.Number `json:"heap_live_slots"`
+	HeapFreeSlots                       json.Number `json:"heap_free_slots"`
+	HeapFinalSlots                      json.Number `json:"heap_final_slots"`
+	HeapMarkedSlots                     json.Number `json:"heap_marked_slots"`
+	HeapSweptSlots                      json.Number `json:"heap_swept_slots"`
+	HeapEdenPages                       json.Number `json:"heap_eden_pages"`
+	HeapTombPages                       json.Number `json:"heap_tomb_pages"`
+	TotalAllocatedPages                 json.Number `json:"total_allocated_pages"`
+	TotalFreedPages                     json.Number `json:"total_freed_pages"`
+	TotalAllocatedObjects               json.Number `json:"total_allocated_objects"`
+	TotalFreedObjects                   json.Number `json:"total_freed_objects"`
+	MallocIncreaseBytes                 json.Number `json:"malloc_increase_bytes"`
+	MallocIncreaseBytesLimit            json.Number `json:"malloc_increase_bytes_limit"`
+	RememberedWbUnprotectedObjects      json.Number `json:"remembered_wb_unprotected_objects"`
+	RememberedWbUnprotectedObjectsLimit json.Number `json:"remembered_wb_unprotected_objects_limit"`
+	OldObjects                          json.Number `json:"old_objects"`
+	OldObjectsLimit                     json.Number `json:"old_objects_limit"`
+	OldmallocIncreaseBytes              json.Number `json:"oldmalloc_increase_bytes"`
+	OldmallocIncreaseBytesLimit         json.Number `json:"oldmalloc_increase_bytes_limit"`
 	// Ruby2.3 is same as Ruby2.2
 	// Ruby2.4 is almost same Ruby2.3 (deletes heap_swept_slots)
 }
@@ -130,21 +132,21 @@ func (p PumaPlugin) getGCStatsAPI() (*GCStats, error) {
 func (p PumaPlugin) fetchGCStatsMetrics(gcStats *GCStats) map[string]float64 {
 	ret := make(map[string]float64)
 
-	ret["total"] = float64(gcStats.Count)
-	ret["minor"] = float64(gcStats.MinorGcCount)
-	ret["major"] = float64(gcStats.MajorGcCount)
+	ret["total"], _ = gcStats.Count.Float64()
+	ret["minor"], _ = gcStats.MinorGcCount.Float64()
+	ret["major"], _ = gcStats.MajorGcCount.Float64()
 
-	ret["available_slots"] = float64(gcStats.HeapAvailableSlots)
-	ret["live_slots"] = float64(gcStats.HeapLiveSlots)
-	ret["free_slots"] = float64(gcStats.HeapFreeSlots)
-	ret["final_slots"] = float64(gcStats.HeapFinalSlots)
-	ret["marked_slots"] = float64(gcStats.HeapMarkedSlots)
+	ret["available_slots"], _ = gcStats.HeapAvailableSlots.Float64()
+	ret["live_slots"], _ = gcStats.HeapLiveSlots.Float64()
+	ret["free_slots"], _ = gcStats.HeapFreeSlots.Float64()
+	ret["final_slots"], _ = gcStats.HeapFinalSlots.Float64()
+	ret["marked_slots"], _ = gcStats.HeapMarkedSlots.Float64()
 
-	ret["old_count"] = float64(gcStats.OldObjects)
-	ret["old_limit"] = float64(gcStats.OldObjectsLimit)
+	ret["old_count"], _ = gcStats.OldObjects.Float64()
+	ret["old_limit"], _ = gcStats.OldObjectsLimit.Float64()
 
-	ret["old_malloc_bytes"] = float64(gcStats.OldmallocIncreaseBytes)
-	ret["old_malloc_limit"] = float64(gcStats.OldmallocIncreaseBytesLimit)
+	ret["old_malloc_bytes"], _ = gcStats.OldmallocIncreaseBytes.Float64()
+	ret["old_malloc_limit"], _ = gcStats.OldmallocIncreaseBytesLimit.Float64()
 
 	return ret
 
