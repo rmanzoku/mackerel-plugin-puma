@@ -107,3 +107,70 @@ func TestFetchGCStatsMetricsRuby21(t *testing.T) {
 		}
 	}
 }
+
+func TestFetchGCStatsMetricsRuby22(t *testing.T) {
+
+	gcStatJSON := `{
+              "count": 5,
+              "heap_allocated_pages": 74,
+              "heap_sorted_length": 75,
+              "heap_allocatable_pages": 0,
+              "heap_available_slots": 30165,
+              "heap_live_slots": 29204,
+              "heap_free_slots": 961,
+              "heap_final_slots": 0,
+              "heap_marked_slots": 8805,
+              "heap_swept_slots": 7197,
+              "heap_eden_pages": 73,
+              "heap_tomb_pages": 1,
+              "total_allocated_pages": 74,
+              "total_freed_pages": 0,
+              "total_allocated_objects": 50243,
+              "total_freed_objects": 21039,
+              "malloc_increase_bytes": 152840,
+              "malloc_increase_bytes_limit": 16777216,
+              "minor_gc_count": 3,
+              "major_gc_count": 2,
+              "remembered_wb_unprotected_objects": 156,
+              "remembered_wb_unprotected_objects_limit": 278,
+              "old_objects": 7418,
+              "old_objects_limit": 10932,
+              "oldmalloc_increase_bytes": 153288,
+              "oldmalloc_increase_bytes_limit": 16777216
+        }`
+
+	desired := map[string]float64{
+		"total":            float64(5),
+		"minor":            float64(3),
+		"major":            float64(2),
+		"available_slots":  float64(30165),
+		"live_slots":       float64(29204),
+		"free_slots":       float64(961),
+		"final_slots":      float64(0),
+		"marked_slots":     float64(8805),
+		"old_count":        float64(7418),
+		"old_limit":        float64(10932),
+		"old_malloc_bytes": float64(153288),
+		"old_malloc_limit": float64(16777216),
+	}
+
+	var p PumaPlugin
+	var gcStats GCStats
+	json.Unmarshal([]byte(gcStatJSON), &gcStats)
+
+	ret, _ := p.fetchGCStatsMetrics(&gcStats)
+
+	if len(ret) != len(desired) {
+		t.Errorf("fetchGCStatsMetrics: len(ret) = %d should be len(desired) = %d", len(ret), len(desired))
+	}
+
+	for k, v := range desired {
+		if _, ok := ret[k]; !ok {
+			t.Errorf("%s not xists", k)
+		}
+
+		if ret[k] != v {
+			t.Errorf("%s should be %f, out %f", k, v, ret[k])
+		}
+	}
+}
