@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	mp "github.com/mackerelio/go-mackerel-plugin"
@@ -62,8 +63,8 @@ type Stats struct {
 	} `json:"worker_status"`
 }
 
-// Fetch /stats
-func (p PumaPlugin) fetchStats() (*Stats, error) {
+// GET request to /stats
+func (p PumaPlugin) getStatsAPI() (*Stats, error) {
 
 	var stats Stats
 
@@ -82,4 +83,22 @@ func (p PumaPlugin) fetchStats() (*Stats, error) {
 	}
 
 	return &stats, nil
+}
+
+// Fetch /stats
+func (p PumaPlugin) fetchStatsMetrics(stats *Stats) map[string]float64 {
+	ret := make(map[string]float64)
+
+	ret["workers"] = float64(stats.Workers)
+	ret["spawn_workers"] = float64(stats.BootedWorkers)
+	ret["removed_workers"] = float64(stats.OldWorkers)
+	ret["phase"] = float64(stats.Phase)
+
+	for _, v := range stats.WorkerStatus {
+		ret["backlog.worker"+strconv.Itoa(v.Index)+".backlog"] = float64(v.LastStatus.Backlog)
+		ret["running.worker"+strconv.Itoa(v.Index)+".running"] = float64(v.LastStatus.Running)
+	}
+
+	return ret
+
 }

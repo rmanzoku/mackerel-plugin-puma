@@ -2,7 +2,6 @@ package mppuma
 
 import (
 	"flag"
-	"strconv"
 
 	mp "github.com/mackerelio/go-mackerel-plugin"
 )
@@ -20,19 +19,15 @@ type PumaPlugin struct {
 func (p PumaPlugin) FetchMetrics() (map[string]float64, error) {
 	ret := make(map[string]float64)
 
-	stats, err := p.fetchStats()
+	stats, err := p.getStatsAPI()
 	if err != nil {
 		return nil, err
 	}
 
-	ret["workers"] = float64(stats.Workers)
-	ret["spawn_workers"] = float64(stats.BootedWorkers)
-	ret["removed_workers"] = float64(stats.OldWorkers)
-	ret["phase"] = float64(stats.Phase)
+	statsMetrics := p.fetchStatsMetrics(stats)
 
-	for _, v := range stats.WorkerStatus {
-		ret["backlog.worker"+strconv.Itoa(v.Index)+".backlog"] = float64(v.LastStatus.Backlog)
-		ret["running.worker"+strconv.Itoa(v.Index)+".running"] = float64(v.LastStatus.Running)
+	for k, v := range statsMetrics {
+		ret[k] = v
 	}
 
 	if p.WithGC == false {
