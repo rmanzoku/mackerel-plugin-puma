@@ -106,7 +106,7 @@ type GCStats struct {
 }
 
 // Fetch /gc-stats
-func (p PumaPlugin) fetchGCStats() (*GCStats, error) {
+func (p PumaPlugin) getGCStatsAPI() (*GCStats, error) {
 
 	var gcStats GCStats
 
@@ -125,4 +125,27 @@ func (p PumaPlugin) fetchGCStats() (*GCStats, error) {
 	}
 
 	return &gcStats, nil
+}
+
+func (p PumaPlugin) fetchGCStatsMetrics(gcStats *GCStats) map[string]float64 {
+	ret := make(map[string]float64)
+
+	ret["total"] = float64(gcStats.Count)
+	ret["minor"] = float64(gcStats.MinorGcCount)
+	ret["major"] = float64(gcStats.MajorGcCount)
+
+	ret["available_slots"] = float64(gcStats.HeapAvailableSlots)
+	ret["live_slots"] = float64(gcStats.HeapLiveSlots)
+	ret["free_slots"] = float64(gcStats.HeapFreeSlots)
+	ret["final_slots"] = float64(gcStats.HeapFinalSlots)
+	ret["marked_slots"] = float64(gcStats.HeapMarkedSlots)
+
+	ret["old_count"] = float64(gcStats.OldObjects)
+	ret["old_limit"] = float64(gcStats.OldObjectsLimit)
+
+	ret["old_malloc_bytes"] = float64(gcStats.OldmallocIncreaseBytes)
+	ret["old_malloc_limit"] = float64(gcStats.OldmallocIncreaseBytesLimit)
+
+	return ret
+
 }

@@ -15,6 +15,18 @@ type PumaPlugin struct {
 	WithGC bool
 }
 
+func merge(m1, m2 map[string]float64) map[string]float64 {
+	ans := make(map[string]float64)
+
+	for k, v := range m1 {
+		ans[k] = v
+	}
+	for k, v := range m2 {
+		ans[k] = v
+	}
+	return (ans)
+}
+
 // FetchMetrics interface for mackerelplugin
 func (p PumaPlugin) FetchMetrics() (map[string]float64, error) {
 	ret := make(map[string]float64)
@@ -24,36 +36,20 @@ func (p PumaPlugin) FetchMetrics() (map[string]float64, error) {
 		return nil, err
 	}
 
-	statsMetrics := p.fetchStatsMetrics(stats)
-
-	for k, v := range statsMetrics {
-		ret[k] = v
-	}
+	ret = p.fetchStatsMetrics(stats)
 
 	if p.WithGC == false {
 		return ret, nil
 	}
 
-	gcStats, err := p.fetchGCStats()
+	gcStats, err := p.getGCStatsAPI()
 	if err != nil {
 		return nil, err
 	}
 
-	ret["total"] = float64(gcStats.Count)
-	ret["minor"] = float64(gcStats.MinorGcCount)
-	ret["major"] = float64(gcStats.MajorGcCount)
+	gcStatsMetrics := p.fetchGCStatsMetrics(gcStats)
 
-	ret["available_slots"] = float64(gcStats.HeapAvailableSlots)
-	ret["live_slots"] = float64(gcStats.HeapLiveSlots)
-	ret["free_slots"] = float64(gcStats.HeapFreeSlots)
-	ret["final_slots"] = float64(gcStats.HeapFinalSlots)
-	ret["marked_slots"] = float64(gcStats.HeapMarkedSlots)
-
-	ret["old_count"] = float64(gcStats.OldObjects)
-	ret["old_limit"] = float64(gcStats.OldObjectsLimit)
-
-	ret["old_malloc_bytes"] = float64(gcStats.OldmallocIncreaseBytes)
-	ret["old_malloc_limit"] = float64(gcStats.OldmallocIncreaseBytesLimit)
+	ret = merge(ret, gcStatsMetrics)
 
 	return ret, nil
 
