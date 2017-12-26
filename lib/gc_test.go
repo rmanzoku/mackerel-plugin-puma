@@ -176,4 +176,71 @@ func TestFetchGCStatsMetricsRuby22(t *testing.T) {
 }
 
 var TestFetchGCStatsMetricsRuby23 = TestFetchGCStatsMetricsRuby22
-var TestFetchGCStatsMetricsRuby24 = TestFetchGCStatsMetricsRuby22
+
+func TestFetchGCStatsMetricsRuby24(t *testing.T) {
+
+	gcStatJSON := `{
+              "count": 8,
+              "heap_allocated_pages": 65,
+              "heap_sorted_length": 65,
+              "heap_allocatable_pages": 0,
+              "heap_available_slots": 26494,
+              "heap_live_slots": 26269,
+              "heap_free_slots": 225,
+              "heap_final_slots": 0,
+              "heap_marked_slots": 11738,
+              "heap_eden_pages": 65,
+              "heap_tomb_pages": 0,
+              "total_allocated_pages": 65,
+              "total_freed_pages": 0,
+              "total_allocated_objects": 66208,
+              "total_freed_objects": 39939,
+              "malloc_increase_bytes": 105872,
+              "malloc_increase_bytes_limit": 16777216,
+              "minor_gc_count": 7,
+              "major_gc_count": 1,
+              "remembered_wb_unprotected_objects": 165,
+              "remembered_wb_unprotected_objects_limit": 286,
+              "old_objects": 10929,
+              "old_objects_limit": 14302,
+              "oldmalloc_increase_bytes": 1351056,
+              "oldmalloc_increase_bytes_limit": 16777216
+        }`
+
+	desired := map[string]float64{
+		"total":            float64(8),
+		"minor":            float64(7),
+		"major":            float64(1),
+		"available_slots":  float64(26494),
+		"live_slots":       float64(26269),
+		"free_slots":       float64(225),
+		"final_slots":      float64(0),
+		"marked_slots":     float64(11738),
+		"old_count":        float64(10929),
+		"old_limit":        float64(14302),
+		"old_malloc_bytes": float64(1351056),
+		"old_malloc_limit": float64(16777216),
+	}
+
+	var p PumaPlugin
+	var gcStats GCStats
+	json.Unmarshal([]byte(gcStatJSON), &gcStats)
+
+	ret, _ := p.fetchGCStatsMetrics(&gcStats)
+
+	if len(ret) != len(desired) {
+		t.Errorf("fetchGCStatsMetrics: len(ret) = %d should be len(desired) = %d", len(ret), len(desired))
+	}
+
+	for k, v := range desired {
+		if _, ok := ret[k]; !ok {
+			t.Errorf("%s not xists", k)
+		}
+
+		if ret[k] != v {
+			t.Errorf("%s should be %f, out %f", k, v, ret[k])
+		}
+	}
+}
+
+var TestFetchGCStatsMetricsRuby25 = TestFetchGCStatsMetricsRuby24
