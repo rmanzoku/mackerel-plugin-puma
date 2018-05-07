@@ -12,6 +12,7 @@ type PumaPlugin struct {
 	Host   string
 	Port   string
 	Token  string
+	Single bool
 	WithGC bool
 }
 
@@ -84,6 +85,7 @@ func Do() {
 		optHost     = flag.String("host", "127.0.0.1", "The bind url to use for the control server")
 		optPort     = flag.String("port", "9293", "The bind port to use for the control server")
 		optToken    = flag.String("token", "", "The token to use as authentication for the control server")
+		optSingle   = flag.Bool("single", false, "Puma in single mode")
 		optWithGC   = flag.Bool("with-gc", false, "Output include GC stats for Puma 3.10.0~")
 		optTempfile = flag.String("tempfile", "", "Temp file name")
 	)
@@ -94,6 +96,7 @@ func Do() {
 	puma.Host = *optHost
 	puma.Port = *optPort
 	puma.Token = *optToken
+	puma.Single = *optSingle
 	puma.WithGC = *optWithGC
 
 	helper := mp.NewMackerelPlugin(puma)

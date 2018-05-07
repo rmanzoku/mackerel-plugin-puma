@@ -61,6 +61,9 @@ type Stats struct {
 			Running int `json:"running"`
 		} `json:"last_status"`
 	} `json:"worker_status"`
+	// Single mode
+	Backlog int `json:"backlog"`
+	Running int `json:"running"`
 }
 
 // GET request to /stats
@@ -88,6 +91,12 @@ func (p PumaPlugin) getStatsAPI() (*Stats, error) {
 // Fetch /stats
 func (p PumaPlugin) fetchStatsMetrics(stats *Stats) map[string]float64 {
 	ret := make(map[string]float64)
+
+	if p.Single == true {
+		ret["backlog.worker0.backlog"] = float64(stats.Backlog)
+		ret["running.worker0.running"] = float64(stats.Running)
+		return ret
+	}
 
 	ret["workers"] = float64(stats.Workers)
 	ret["spawn_workers"] = float64(stats.BootedWorkers)

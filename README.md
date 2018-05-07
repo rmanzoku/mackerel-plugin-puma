@@ -23,6 +23,8 @@ Usage of mackerel-plugin-puma:
     	Temp file name
   -token string
     	The token to use as authentication for the control server
+  -single
+    	Monitor Puma in single mode
   -with-gc
     	Output include GC stats for Puma 3.10.0~
 ```
@@ -30,7 +32,7 @@ Usage of mackerel-plugin-puma:
 
 ```
 [plugin.metrics.puma]
-command = "/opt/mackerel-agent/plugins/bin/mackerel-plugin-puma -token=12345 --with-gc"
+command = "/opt/mackerel-agent/plugins/bin/mackerel-plugin-puma -token=12345 --single --with-gc"
 ```
 
 ## Screenshot
