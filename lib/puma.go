@@ -60,6 +60,10 @@ func (p PumaPlugin) FetchMetrics() (map[string]float64, error) {
 func (p PumaPlugin) GraphDefinition() map[string]mp.Graphs {
 	graphdef := graphdefStats
 
+	if p.Single == true {
+		graphdef = graphdefStatsSingle
+	}
+
 	if p.WithGC == false {
 		return graphdef
 	}

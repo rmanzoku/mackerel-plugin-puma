@@ -32,7 +32,7 @@ var graphdefStats = map[string]mp.Graphs{
 		Label: "Puma Running Thread",
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
-			{Name: "running", Label: "running", Diff: false, Stacked: true},
+			{Name: "running", Label: "Running", Diff: false, Stacked: true},
 		},
 	},
 	"phase": {
@@ -40,6 +40,23 @@ var graphdefStats = map[string]mp.Graphs{
 		Unit:  "integer",
 		Metrics: []mp.Metrics{
 			{Name: "phase", Label: "Active phase", Diff: false},
+		},
+	},
+}
+
+var graphdefStatsSingle = map[string]mp.Graphs{
+	"backlog": {
+		Label: "Puma Backlog",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "backlog", Label: "Backlog", Diff: false, Stacked: true},
+		},
+	},
+	"running": {
+		Label: "Puma Running Thread",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "running", Label: "Running", Diff: false, Stacked: true},
 		},
 	},
 }
@@ -93,8 +110,8 @@ func (p PumaPlugin) fetchStatsMetrics(stats *Stats) map[string]float64 {
 	ret := make(map[string]float64)
 
 	if p.Single == true {
-		ret["backlog.worker0.backlog"] = float64(stats.Backlog)
-		ret["running.worker0.running"] = float64(stats.Running)
+		ret["backlog"] = float64(stats.Backlog)
+		ret["running"] = float64(stats.Running)
 		return ret
 	}
 
