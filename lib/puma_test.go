@@ -103,8 +103,8 @@ func TestGraphDefinitionSingle(t *testing.T) {
 	}`
 
 	desired := map[string]float64{
-		"backlog.worker0.backlog": float64(1),
-		"running.worker0.running": float64(5),
+		"backlog": float64(1),
+		"running": float64(5),
 	}
 
 	var p PumaPlugin
