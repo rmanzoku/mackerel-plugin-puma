@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/rmanzoku/mackerel-plugin-puma.svg?style=svg)](https://circleci.com/gh/rmanzoku/mackerel-plugin-puma)
+
 # mackerel-plugin-puma
 Mackerel plugin for Puma
 
