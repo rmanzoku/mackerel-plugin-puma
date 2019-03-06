@@ -37,5 +37,12 @@ Usage of mackerel-plugin-puma:
 command = "/opt/mackerel-agent/plugins/bin/mackerel-plugin-puma -token=12345 --single --with-gc"
 ```
 
+For unix domain socket:
+
+```
+[plugin.metrics.puma]
+command = "/opt/mackerel-agent/plugins/bin/mackerel-plugin-puma -sock /path/to/pumactl.socket -token=12345 --single --with-gc"
+```
+
 ## Screenshot
 ![Screenshot](./docs/images/ss.png)

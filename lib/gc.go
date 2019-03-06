@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 
 	mp "github.com/mackerelio/go-mackerel-plugin"
@@ -112,8 +113,20 @@ func (p PumaPlugin) getGCStatsAPI() (*GCStats, error) {
 
 	var gcStats GCStats
 
+	var client http.Client
+
+	if p.Sock != "" {
+		client = http.Client{Transport: &http.Transport{
+			Dial: func(proto, addr string) (conn net.Conn, err error) {
+				return net.Dial("unix", p.Sock)
+			},
+		}}
+	} else {
+		client = http.Client{}
+	}
+
 	uri := fmt.Sprintf("http://%s:%s/%s?token=%s", p.Host, p.Port, "gc-stats", p.Token)
-	resp, err := http.Get(uri)
+	resp, err := client.Get(uri)
 	if err != nil {
 		return nil, err
 	}

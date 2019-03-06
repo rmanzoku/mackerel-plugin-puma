@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -88,8 +89,20 @@ func (p PumaPlugin) getStatsAPI() (*Stats, error) {
 
 	var stats Stats
 
+	var client http.Client
+
+	if p.Sock != "" {
+		client = http.Client{Transport: &http.Transport{
+			Dial: func(proto, addr string) (conn net.Conn, err error) {
+				return net.Dial("unix", p.Sock)
+			},
+		}}
+	} else {
+		client = http.Client{}
+	}
+
 	uri := fmt.Sprintf("http://%s:%s/%s?token=%s", p.Host, p.Port, "stats", p.Token)
-	resp, err := http.Get(uri)
+	resp, err := client.Get(uri)
 	if err != nil {
 		return nil, err
 	}
