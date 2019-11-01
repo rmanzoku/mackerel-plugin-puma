@@ -36,6 +36,13 @@ var graphdefStats = map[string]mp.Graphs{
 			{Name: "running", Label: "Running", Diff: false, Stacked: true},
 		},
 	},
+	"pool_capacity.#": {
+		Label: "Puma Pool Capacity",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "pool_capacity", Label: "Pool Capacity", Diff: false, Stacked: true},
+		},
+	},
 	"phase": {
 		Label: "Puma Phase",
 		Unit:  "integer",
@@ -60,6 +67,13 @@ var graphdefStatsSingle = map[string]mp.Graphs{
 			{Name: "running", Label: "Running", Diff: false, Stacked: true},
 		},
 	},
+	"pool_capacity": {
+		Label: "Puma Pool Capacity",
+		Unit:  "integer",
+		Metrics: []mp.Metrics{
+			{Name: "pool_capacity", Label: "Pool Capacity", Diff: false, Stacked: true},
+		},
+	},
 }
 
 // Stats is convered from /stats json
@@ -75,13 +89,15 @@ type Stats struct {
 		Booted      bool      `json:"booted"`
 		LastCheckin time.Time `json:"last_checkin"`
 		LastStatus  struct {
-			Backlog int `json:"backlog"`
-			Running int `json:"running"`
+			Backlog      int `json:"backlog"`
+			Running      int `json:"running"`
+			PoolCapacity int `json:"pool_capacity"`
 		} `json:"last_status"`
 	} `json:"worker_status"`
 	// Single mode
-	Backlog int `json:"backlog"`
-	Running int `json:"running"`
+	Backlog      int `json:"backlog"`
+	Running      int `json:"running"`
+	PoolCapacity int `json:"pool_capacity"`
 }
 
 // GET request to /stats
@@ -125,6 +141,7 @@ func (p PumaPlugin) fetchStatsMetrics(stats *Stats) map[string]float64 {
 	if p.Single == true {
 		ret["backlog"] = float64(stats.Backlog)
 		ret["running"] = float64(stats.Running)
+		ret["pool_capacity"] = float64(stats.PoolCapacity)
 		return ret
 	}
 
@@ -136,6 +153,7 @@ func (p PumaPlugin) fetchStatsMetrics(stats *Stats) map[string]float64 {
 	for _, v := range stats.WorkerStatus {
 		ret["backlog.worker"+strconv.Itoa(v.Index)+".backlog"] = float64(v.LastStatus.Backlog)
 		ret["running.worker"+strconv.Itoa(v.Index)+".running"] = float64(v.LastStatus.Running)
+		ret["running.worker"+strconv.Itoa(v.Index)+".pool_capacity"] = float64(v.LastStatus.PoolCapacity)
 	}
 
 	return ret
