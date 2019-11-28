@@ -6,7 +6,7 @@ import (
 )
 
 func TestGraphDefinition(t *testing.T) {
-	desired := 4
+	desired := 5
 
 	var puma PumaPlugin
 
@@ -18,7 +18,7 @@ func TestGraphDefinition(t *testing.T) {
 }
 
 func TestGraphDefinitionWithGC(t *testing.T) {
-	desired := 8
+	desired := 9
 
 	var puma PumaPlugin
 	puma.WithGC = true
@@ -46,7 +46,8 @@ func TestGraphDefinitionCluster(t *testing.T) {
 	      "last_checkin": "2018-04-17T01:24:16Z",
 	      "last_status": {
 	        "backlog": 1,
-	        "running": 5
+	        "running": 5,
+	        "pool_capacity": 4
 	      }
 	    },
 	    {
@@ -57,21 +58,24 @@ func TestGraphDefinitionCluster(t *testing.T) {
 	      "last_checkin": "2018-04-17T01:24:16Z",
 	      "last_status": {
 	        "backlog": 1,
-	        "running": 5
+	        "running": 5,
+	        "pool_capacity": 4
 	      }
 	    }
 	  ]
 	}`
 
 	desired := map[string]float64{
-		"workers":                 float64(2),
-		"spawn_workers":           float64(2),
-		"removed_workers":         float64(0),
-		"phase":                   float64(0),
-		"backlog.worker0.backlog": float64(1),
-		"running.worker0.running": float64(5),
-		"backlog.worker1.backlog": float64(1),
-		"running.worker1.running": float64(5),
+		"workers":                       float64(2),
+		"spawn_workers":                 float64(2),
+		"removed_workers":               float64(0),
+		"phase":                         float64(0),
+		"backlog.worker0.backlog":       float64(1),
+		"running.worker0.running":       float64(5),
+		"running.worker0.pool_capacity": float64(4),
+		"backlog.worker1.backlog":       float64(1),
+		"running.worker1.running":       float64(5),
+		"running.worker1.pool_capacity": float64(4),
 	}
 
 	var p PumaPlugin
@@ -99,12 +103,14 @@ func TestGraphDefinitionSingle(t *testing.T) {
 
 	statJSON := `{
 		"backlog": 1,
-		"running": 5
+		"running": 5,
+		"pool_capacity": 4
 	}`
 
 	desired := map[string]float64{
-		"backlog": float64(1),
-		"running": float64(5),
+		"backlog":       float64(1),
+		"running":       float64(5),
+		"pool_capacity": float64(4),
 	}
 
 	var p PumaPlugin
