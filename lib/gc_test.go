@@ -244,3 +244,4 @@ func TestFetchGCStatsMetricsRuby24(t *testing.T) {
 }
 
 var TestFetchGCStatsMetricsRuby25 = TestFetchGCStatsMetricsRuby24
+var TestFetchGCStatsMetricsRuby26 = TestFetchGCStatsMetricsRuby25
